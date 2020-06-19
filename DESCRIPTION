@@ -1,13 +1,13 @@
 Package: transformr
 Type: Package
 Title: Polygon and Path Transformations
-Version: 0.1.1
-Date: 2018-12-04
+Version: 0.1.2
 Authors@R: 
     person(given = "Thomas Lin",
            family = "Pedersen",
            role = c("cre", "aut"),
-           email = "thomasp85@gmail.com")
+           email = "thomasp85@gmail.com",
+           comment = c(ORCID = "0000-0002-5147-4711"))
 Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
 Description: In order to smoothly animate the transformation of polygons and 
     paths, many aspects needs to be taken into account, such as differing number 
@@ -22,11 +22,12 @@ LazyData: true
 Imports: Rcpp (>= 0.12.15), tweenr, rlang, sf, lpSolve
 Suggests: magrittr
 LinkingTo: Rcpp
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0.9000
 URL: https://github.com/thomasp85/transformr
 BugReports: https://github.com/thomasp85/transformr/issues
 NeedsCompilation: yes
-Packaged: 2018-12-04 10:53:59 UTC; thomas
+Packaged: 2020-06-19 07:45:23 UTC; thomas
 Author: Thomas Lin Pedersen [cre, aut]
+    (<https://orcid.org/0000-0002-5147-4711>)
 Repository: CRAN
-Date/Publication: 2018-12-09 16:30:02 UTC
+Date/Publication: 2020-06-19 08:00:03 UTC
