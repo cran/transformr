@@ -1,3 +1,13 @@
+find_splits <- function(lengths, n) {
+  find_splits_c(as.numeric(lengths), as.integer(n))
+}
+insert_points <- function(x, y, splits, n) {
+  insert_points_c(as.numeric(x), as.numeric(y), as.integer(splits), as.integer(n))
+}
+rotate <- function(poly_x, poly_y, ref_x, ref_y) {
+  rotate_c(as.numeric(poly_x), as.numeric(poly_y), as.numeric(ref_x), as.numeric(ref_y))
+}
+
 add_points <- function(polygon, n, connect = TRUE) {
   if (n < 1) {
     return(polygon)
@@ -40,6 +50,7 @@ add_points <- function(polygon, n, connect = TRUE) {
   new_polygon
 }
 
+#' @importFrom rlang as_function
 match_shapes <- function(from, to, enter, exit, min_n, closed = TRUE) {
   if (is.null(from)) {
     if (is.null(enter)) {
@@ -47,7 +58,7 @@ match_shapes <- function(from, to, enter, exit, min_n, closed = TRUE) {
       to <- from
     } else {
       from <- lapply(to, function(x) {
-        x <- enter(x)
+        x <- as_function(enter)(x)
         x$.phase <- 'enter'
         x
       })
@@ -58,7 +69,7 @@ match_shapes <- function(from, to, enter, exit, min_n, closed = TRUE) {
       from <- to
     } else {
       to <- lapply(from, function(x) {
-        x <- exit(x)
+        x <- as_function(exit)(x)
         x$.phase <- 'exit'
         x
       })
@@ -68,8 +79,8 @@ match_shapes <- function(from, to, enter, exit, min_n, closed = TRUE) {
     from <- matched$from
     to <- matched$to
   }
-  from <- do.call(rbind, lapply(from, function(x) x[seq_len(nrow(x) + 1), ]))
-  to <- do.call(rbind, lapply(to, function(x) x[seq_len(nrow(x) + 1), ]))
+  from <- vec_rbind(!!!lapply(from, function(x) x[seq_len(nrow(x) + 1), ]))
+  to <- vec_rbind(!!!lapply(to, function(x) x[seq_len(nrow(x) + 1), ]))
   from <- from[-nrow(from), ]
   to <- to[-nrow(to), ]
   list(from = from, to = to)
@@ -82,8 +93,8 @@ match_polygon <- function(from, to, min_n) {
   if (nrow(main_to) < n_points) main_to <- add_points(main_to, n_points - nrow(main_to), connect = TRUE)
   offset <- rotate(main_to$x, main_to$y, main_from$x, main_from$y)
   to_end <- seq_len(nrow(main_to)) < offset
-  main_to <- rbind(main_to[!to_end, , drop = FALSE],
-                   main_to[to_end, , drop = FALSE])
+  main_to <- vec_rbind(main_to[!to_end, , drop = FALSE],
+                       main_to[to_end, , drop = FALSE])
   from[[1]] <- main_from
   to[[1]] <- main_to
   if (length(from) > 1 || length(to) > 1) {
@@ -109,4 +120,15 @@ common_id <- function(from, to) {
   from$.id <- match(from_id, all_id)
   to$.id <- match(to_id, all_id)
   list(from = from, to = to)
+}
+
+first <- function(x) x[[1]]
+`first<-` <- function(x, value) {
+  x[[1]] <- value
+  x
+}
+last <- function(x) x[[length(x)]]
+`last<-` <- function(x, value) {
+  x[[length(x)]] <- value
+  x
 }

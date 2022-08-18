@@ -3,14 +3,12 @@
 
 # transformr <img src="man/figures/logo.png" align="right"/>
 
-[![Travis-CI Build
-Status](https://travis-ci.org/thomasp85/transformr.svg?branch=master)](https://travis-ci.org/thomasp85/transformr)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/thomasp85/transformr?branch=master&svg=true)](https://ci.appveyor.com/project/thomasp85/transformr)
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/transformr)](https://cran.r-project.org/package=transformr)
-[![CRAN\_Download\_Badge](https://cranlogs.r-pkg.org/badges/grand-total/transformr)](https://cran.r-project.org/package=transformr)
-[![Coverage
-Status](https://img.shields.io/codecov/c/github/thomasp85/transformr/master.svg)](https://codecov.io/github/thomasp85/transformr?branch=master)
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/thomasp85/transformr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/thomasp85/transformr/actions/workflows/R-CMD-check.yaml)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version-ago/transformr)](https://cran.r-project.org/package=transformr)
+[![CRAN_Download_Badge](https://cranlogs.r-pkg.org/badges/grand-total/transformr)](https://cran.r-project.org/package=transformr)
+<!-- badges: end -->
 
 If you’ve ever made animated data visualisations you’ll know that
 arbitrary polygons and lines requires special considerations if the
@@ -30,7 +28,9 @@ encoded as simple x/y data.frames or as simpel features using the
 
 ## Installation
 
-You can install transformr from github with:
+You can install transformr from CRAN using
+`install.packages('transformr')` or grab the development version from
+github with:
 
 ``` r
 # install.packages("devtools")
@@ -112,8 +112,9 @@ Our last option is to not match the polygons up, but simply say “make
 everything in the first state, into everything in the last state…
 somehow”. This involves cutting up polygons in the state with fewest
 polygons and match polygons by minimizing the distance and area
-difference between pairs. All of this is controlled by setting `match =
-FALSE` in `tween_polygon()`, and `transformr` will then do its magic:
+difference between pairs. All of this is controlled by setting
+`match = FALSE` in `tween_polygon()`, and `transformr` will then do its
+magic:
 
 ``` r
 animation <- tween_polygon(star, circles, 'cubic-in-out', 40, id, match = FALSE) %>% 
@@ -208,9 +209,3 @@ ani <- lapply(split(animation, animation$.frame), sfplot)
 ```
 
 ![](man/figures/README-unnamed-chunk-7.gif)
-
-## Future
-
-The main goal right now is to get `transformr` ready for a release on
-CRAN. Further development will be guided by the needs of the community,
-so open an issue if you have any unmet needs or cool ideas\!
