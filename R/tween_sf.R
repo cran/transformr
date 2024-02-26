@@ -20,6 +20,7 @@
 #'
 #' @importFrom tweenr .complete_states .max_id .has_frames
 #' @importFrom rlang enquo
+#' @importFrom sf st_crs st_crs<- st_transform
 #' @export
 #'
 #' @examples
@@ -39,6 +40,25 @@ tween_sf <- function(.data, to, ease, nframes, id = NULL, enter = NULL, exit = N
   if (!is.data.frame(.data)) {
     stop('`.data` must be a `data.frame`', call. = FALSE)
   }
+  sf_columns <- vapply(.data, inherits, logical(1), 'sfc')
+  if (!any(sf_columns)) return(tween_state(.data, to, ease, nframes, !!id, enter, exit))
+
+  for (col in which(sf_columns)) {
+    from_crs <- st_crs(.data[[col]])
+    to_crs <- st_crs(to[[col]])
+    if (is.na(from_crs)) {
+      if (!is.na(to_crs)) {
+        st_crs(.data[[col]]) <- to_crs
+      }
+      next
+    }
+    if (is.na(to_crs)) {
+      st_crs(to[[col]]) <- from_crs
+    } else {
+      to[[col]] <- st_transform(to[[col]], from_crs)
+    }
+  }
+
   from <- .get_last_frame(.data)
   from$.phase <- rep('raw', nrow(from))
   to$.phase <- rep('raw', nrow(to))
@@ -46,8 +66,9 @@ tween_sf <- function(.data, to, ease, nframes, id = NULL, enter = NULL, exit = N
   id <- enquo(id)
   if (.has_frames(.data)) nframes <- nframes + 1
 
+  # recalc to make sure .phase and .id columns are included
   sf_columns <- vapply(from, inherits, logical(1), 'sfc')
-  if (!any(sf_columns)) return(tween_state(.data, to, ease, nframes, !!id, enter, exit))
+
   full_set <- .complete_states(from, to, id, enter, exit, .max_id(.data))
   to$.id <- full_set$orig_to
   sf_from <- full_set$from[, sf_columns, drop = FALSE]
@@ -57,6 +78,7 @@ tween_sf <- function(.data, to, ease, nframes, id = NULL, enter = NULL, exit = N
   morph <- tween_state(as.data.frame(full_set$from), as.data.frame(full_set$to), ease, nframes, id = NULL, enter, exit)
   morph[which(sf_columns)] <- tween_sf_col(sf_from, sf_to, rep(ease, length.out = ncol(from))[sf_columns], nframes)
   morph <- morph[!morph$.frame %in% c(1, nframes), , drop = FALSE]
+  if (nrow(morph) == 0) morph <- NULL
   morph <- vec_rbind(
     if (nframes > 1) cbind(as.data.frame(from), .frame = rep(1, nrow(from))) else NULL,
     morph,
@@ -69,16 +91,17 @@ tween_sf <- function(.data, to, ease, nframes, id = NULL, enter = NULL, exit = N
 tween_sf_col <- function(from, to, ease, nframes) {
   lapply(seq_along(from), function(i) {
     aligned <- align_sf(from[[i]], to[[i]])
+    if (is.null(aligned)) return(st_sfc(list()))
     tweened <- tween_state(aligned$from, aligned$to, ease, nframes)
     tweened$id <- as.integer(tweened$id)
     tweened$sf_id <- as.integer(tweened$sf_id)
     tweened$.frame <- as.integer(tweened$.frame)
-    st_sfc(repack_sf(tweened, aligned$type, as.integer(nframes)))
+    st_sfc(repack_sf(tweened, aligned$type, as.integer(nframes)), crs = st_crs(from[[i]]))
   })
 }
 
 align_sf <- function(from, to) {
-  if (length(from) == 0 && length(to) == 0) return(st_sfc(list()))
+  if (length(from) == 0 && length(to) == 0) return(NULL)
   from_type <- as.character(unlist(lapply(from, st_geometry_type)))
   if (!all(from_type %in% supp_types)) stop('Unsupported geometry type', call. = FALSE)
   to_type <- as.character(unlist(lapply(to, st_geometry_type)))

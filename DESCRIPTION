@@ -1,7 +1,7 @@
 Package: transformr
 Type: Package
 Title: Polygon and Path Transformations
-Version: 0.1.4
+Version: 0.1.5
 Authors@R: 
     person(given = "Thomas Lin",
            family = "Pedersen",
@@ -17,16 +17,15 @@ Description: In order to smoothly animate the transformation of polygons and
     package.
 License: MIT + file LICENSE
 Encoding: UTF-8
-SystemRequirements: C++11
 Imports: tweenr, rlang, sf, lpSolve, vctrs
 Suggests: covr, magrittr
 LinkingTo: cpp11
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.1
 URL: https://github.com/thomasp85/transformr
 BugReports: https://github.com/thomasp85/transformr/issues
 NeedsCompilation: yes
-Packaged: 2022-08-18 11:11:09 UTC; thomas
+Packaged: 2024-02-26 13:46:42 UTC; thomas
 Author: Thomas Lin Pedersen [cre, aut]
     (<https://orcid.org/0000-0002-5147-4711>)
 Repository: CRAN
-Date/Publication: 2022-08-18 11:30:02 UTC
+Date/Publication: 2024-02-26 14:30:02 UTC
